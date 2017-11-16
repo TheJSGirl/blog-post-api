@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const sendResponse = require('../helpers/sendResponse');
 
-const checkAuth = asyn(req, res, next) => {
+const checkAuth = async(req, res, next) => {
 const token = req.header('x-auth');
 
 if(!token || typeof token === undefined){
@@ -10,12 +10,18 @@ if(!token || typeof token === undefined){
 
   try{
     //decode token
-    const decode = await jwt.verify(token, 'abcdefghklmnop');
+    const decode = await jwt.verify(token, 'abcdefghijklmnop');
     console.log(decode);
+    req.user = decode;
+    next();
   }
   catch(err){
-
+    console.log(err);
+    if(err.name === 'TokenExpiredError'){
+      return sendResponse(res, 401, [], 'token expired');
+    }
+    return sendResponse(res, 500, [], 'something went wrong');
   }
 }
 
-module.exports = sendResponse;
+module.exports = checkAuth;
