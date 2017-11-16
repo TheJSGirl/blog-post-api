@@ -5,11 +5,29 @@ const {sendResponse} = require('../helpers');
 posts.route('/posts')
   .get(async(req, res) => {
     try{
-      const [data] = await pool.query('SELECT post_title, description, userName, createdAt from blogs INNER JOIN users on blogs.id= users.id ');
+      
+      const [data] = await pool.query('SELECT blogs.id, post_title, description, userName, createdAt from blogs INNER JOIN users on blogs.createdBy= users.id ');
       // console.log(data);
       if(data.length === 0){
         return sendResponse(res, 404, [], 'not found');
       } 
+
+      //comments query on post
+      const commentQuery = `SELECT c.comments,c.commentedOn, c.createdAt, u.userName as commentedBy
+      FROM comments as c 
+      INNER JOIN 
+      blogs 
+      ON 
+      c.commentedOn = blogs.id 
+      INNER JOIN
+      users as u 
+      ON 
+      c.commentedBy = u.id`;
+    
+      //execute query and get comments on a particular post
+      const [comments] = await pool.query(commentQuery);
+      data.push(comments);
+      
       return sendResponse(res, 200, data, 'successful');
     } 
   
@@ -28,9 +46,9 @@ posts.route('/posts')
 
     let errors = req.validationErrors();
     
-            if(errors){
-                return sendResponse(res, 422, [], errors[0].msg);
-            }
+    if(errors){
+      return sendResponse(res, 422, [], errors[0].msg);
+    }
 
     try{
     //check the loggedin user
@@ -60,7 +78,7 @@ posts.route('/post/:id')
   .get(async (req, res) => {
     
     //validate id
-    req.checkBody('id', 'id is missing').exists();
+    req.checkBody('id', 'id is missing').notEmpty();
   
     const id = parseInt(req.params.id);
     // const id = req.params.id;
@@ -109,5 +127,43 @@ posts.route('/post/:id')
       console.log(err);
       return sendResponse(res, 500, [], 'internal server error');
     }
+  })
+
+  .post(async (req, res) => {
+  
+    //validate id and comments
+    req.checkBody('id', 'id is missing').notEmpty();
+    req.checkBody('comments', 'comment require').notEmpty().isAlphanumeric();
+    
+    
+    const id = parseInt(req.params.id);
+    const userId = req.user.userId;
+    
+    if(isNaN(id)){
+        return sendResponse(res, 422, [], 'invalid parameters');
+      }
+    
+    const { comments} = req.body;
+    
+    try{
+      
+      commentData = {
+        comments,
+        commentedBy: userId,
+        commentedOn: id
+      }
+
+      //query to insert comment detail in db
+      const [comment] = await pool.query('INSERT INTO comments SET ?', commentData);
+
+      return sendResponse(res, 200, comment, 'commented on post');
+    }
+
+    catch(err){
+      console.log(err);
+
+    }
+    
+
   })
 module.exports = posts;
