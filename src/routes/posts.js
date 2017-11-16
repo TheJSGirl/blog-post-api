@@ -27,7 +27,7 @@ posts.route('/posts')
       //execute query and get comments on a particular post
       const [comments] = await pool.query(commentQuery);
       data.push(comments);
-      
+
       return sendResponse(res, 200, data, 'successful');
     } 
   
@@ -162,8 +162,8 @@ posts.route('/post/:id')
     catch(err){
       console.log(err);
 
+      return sendResponse(res, 500, [], 'something went wrong');
     }
-    
+  });
 
-  })
 module.exports = posts;
