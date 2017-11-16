@@ -14,40 +14,44 @@ admin.route('/:postId')
     if(isNaN(postId)){
       return sendResponse(res, 422, [], 'invalid parameters');
     }
+
     const userId = req.user.id;
     const userType = req.user.userType;
     const {post_title, description} = req.body;
     const updateValues = [];
     
 
+    //check if post_title or description is empty
     if(!post_title && !description){
       return sendResponse(res, 422, [], 'missing parameters');
     }
 
     if(post_title){
+      //check post_title length should be greater than zero if true then updateValues
       if(post_title.length > 0){
-        
         updateValues.push(`post_title = '${post_title}'`);
-    
       }
     }
 
 
     if(description ){
+      //check description length should be greater than zero if true then updateValues
       if(description.length > 0){
-        
         updateValues.push(`description = '${description}' `);
       }
     }
+    //set updateQuery
     let updateQuery = 'UPDATE blogs SET ';
 
+    //if updateValues length is greater than zero then join both updateValues with join method
     if(updateValues.length > 0){
     updateQuery += updateValues.join();
     
     }
+    //set where clause to updateQuery
     updateQuery += `WHERE id = '${postId}'`;
 
-    console.log(updateQuery);
+    // console.log(updateQuery);
 
     try{
 
