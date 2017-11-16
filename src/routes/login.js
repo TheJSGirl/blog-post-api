@@ -22,7 +22,7 @@ login.route('/')
 
     try{
 
-      const [result] = await pool.query(`SELECT userName, password, userType FROM users where userName = '${userName}'`);
+      const [result] = await pool.query(`SELECT id, password, userType FROM users where userName = '${userName}'`);
 
       const passwordFromDb = result[0].password;
      
@@ -34,12 +34,12 @@ login.route('/')
       }
 
       const userDetailForToken = {
-        userName,
+        userId: result[0].id,
         userType: result[0].userType,
       }
 
       //generate token 
-      const token = jwt.sign(userDetailForToken, 'abcdefghijklmnop', {expiresIn: 60});
+      const token = jwt.sign(userDetailForToken, 'abcdefghijklmnop', {expiresIn: 60*60});
       // console.log('your token is:', token);
 
       return res.header('x-auth', token).status(200).json({

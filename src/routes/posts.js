@@ -20,18 +20,52 @@ posts.route('/posts')
   })
 
   .post(async (req, res) => {
+
+      console.log(req.body);
+    //validate
+    req.checkBody('post_title', 'title is missing').notEmpty();
+    req.checkBody('description', 'description is too short or missing description field').notEmpty()  ;
+
+    let errors = req.validationErrors();
+    
+            if(errors){
+                return sendResponse(res, 422, [], errors[0].msg);
+            }
+
+    try{
     //check the loggedin user
+    const userId = req.user.userId;
+
+    const {post_title, description} = req.body;
+    
+
+    //object of post
+     const post = {
+      post_title,
+      createdBy: userId,
+      description
+    }
+
+    const [blogPost] = await pool.query('INSERT INTO blogs SET ? ', post);
+
+    return sendResponse(res, 200, blogPost, 'successful');
+    }
+    catch(err){
+      console.log(err);
+      return sendResponse(res, 500, [], 'something went wrong');
+    }
   })
 
 posts.route('/post/:id')
   .get(async (req, res) => {
-
-  req.checkBody('id', 'id is missing').exists();
+    
+    //validate id
+    req.checkBody('id', 'id is missing').exists();
   
     const id = parseInt(req.params.id);
     // const id = req.params.id;
     if(isNaN(id)){
-      return console.log('error');
+      return sendResponse(res, 422, [], 'invalid parameters');
     }
   
     try{
@@ -73,6 +107,7 @@ posts.route('/post/:id')
   
     catch(err){
       console.log(err);
+      return sendResponse(res, 500, [], 'internal server error');
     }
   })
 module.exports = posts;
