@@ -69,9 +69,7 @@ admin.route('/:postId')
     }
 
   })
-
   .delete(async (req, res) => {
-
     const postId = parseInt(req.params.postId);    
     
     //validate id
@@ -86,15 +84,13 @@ admin.route('/:postId')
     try{
       if(userType === 1){
         const [result] = await pool.query(`DELETE FROM blogs WHERE id = ${postId}`);
-
         return sendResponse(res, 200, [], 'deleted successfully');
-
       }
     }
     catch(err){
-
+      console.log(err);
+      return sendResponse(res, 500, [], 'internal server error');
     }
-
   })
 
 module.exports = admin;

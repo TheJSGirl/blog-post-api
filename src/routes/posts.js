@@ -5,7 +5,6 @@ const {sendResponse} = require('../helpers');
 posts.route('/posts')
   .get(async(req, res) => {
     try{
-      
       const [data] = await pool.query('SELECT blogs.id, post_title, description, userName, createdAt from blogs INNER JOIN users on blogs.createdBy= users.id ');
       // console.log(data);
       if(data.length === 0){
@@ -36,7 +35,6 @@ posts.route('/posts')
       return sendResponse(res, 500, [], 'internal server error');
     }
   })
-
   .post(async (req, res) => {
 
       console.log(req.body);
@@ -56,7 +54,6 @@ posts.route('/posts')
 
     const {post_title, description} = req.body;
     
-
     //object of post
      const post = {
       post_title,
@@ -76,7 +73,6 @@ posts.route('/posts')
 
 posts.route('/post/:id')
   .get(async (req, res) => {
-    
     //validate id
     req.checkBody('id', 'id is missing').notEmpty();
   
@@ -87,7 +83,6 @@ posts.route('/post/:id')
     }
   
     try{
-      
       // postDetail query of post
       const query = `SELECT b.post_title, b.description, b.createdAt as timeOfPost, u.userName
       FROM 
@@ -117,12 +112,9 @@ posts.route('/post/:id')
     
       //execute query and get comments on a particular post
       const [comments] = await pool.query(commentQuery);
-      
       postDetail.push(comments);
-
-        return sendResponse(res, 200, postDetail, 'successful');
+      return sendResponse(res, 200, postDetail, 'successful');
     }
-  
     catch(err){
       console.log(err);
       return sendResponse(res, 500, [], 'internal server error');
@@ -130,12 +122,9 @@ posts.route('/post/:id')
   })
 
   .post(async (req, res) => {
-  
     //validate id and comments
     req.checkBody('id', 'id is missing').notEmpty();
     req.checkBody('comments', 'comment require').notEmpty().isAlphanumeric();
-    
-    
     const id = parseInt(req.params.id);
     const userId = req.user.userId;
     
@@ -161,7 +150,6 @@ posts.route('/post/:id')
 
     catch(err){
       console.log(err);
-
       return sendResponse(res, 500, [], 'something went wrong');
     }
   });
