@@ -36,36 +36,45 @@ comments.route('/:id')
   }
 })
 
+comments.route('/:commentId')
 .delete(async(req, res) => {
   //validate id 
-  req.checkBody('id', 'id is missing').notEmpty();
-  const id = parseInt(req.params.id);
-  const userId = req.user.userId;
+  req.checkBody('commentId', 'id is missing').notEmpty();
+  const commentId = parseInt(req.params.commentId);
+  const userType = req.user.userType;
+  const logedInUser = req.user.userId;
   
-  if(isNaN(id)){
+  if(isNaN(commentId)){
       return sendResponse(res, 422, [], 'invalid parameters');
     }
 
     try{
-      const [result] = await pool.query(`SELECT commentedBy FROM comments WHERE commentedOn = ${id}`);
-      console.log(result[0]);
-      if(userId !== result.commentedBy){
-        return sendResponse(res, 400, [], 'bad request');
-      }
-      if(userId === 1){
-        const [deletedData] = await pool.query(`DELETE FROM comments WHERE commentedOn = ${id}`);
-        console.log(deletedData[0]);
-      }
-      const [deletedData] = await pool.query(`DELETE FROM comments WHERE commentedOn = ${id}`);
-      console.log(deletedData[0]);
+      //execute query to find commentedBy user
+      const [result] = await pool.query(`SELECT commentedBy FROM comments WHERE id = ${commentId}`);
+      // console.log(result[0]);
 
-      return sendResponse(res, 200, deletedData, 'deletion successful');
+      //validate if result is empty
+      if(result.length === 0){
+        return sendResponse(res, 404, [], 'not found');
+      }
+      
+      //check if logedInUser is equal to commentedBy then delete
+      if(logedInUser === result[0].commentedBy){
+        const [deletedData] = await pool.query(`DELETE FROM comments WHERE commentedOn = ${commentId}`);
+        return sendResponse(res, 200, [], 'deletion successful');
+      }
+
+      //check if userType is 1 means admin then delete
+      if(userType  === 1){
+        const [deletedData] = await pool.query(`DELETE FROM comments WHERE id= ${commentId}`);
+        return sendResponse(res, 200, [], 'deletion successful');
+      }
+      return sendResponse(res, 403, [], 'you are not allowed to perform this action');
     }
     catch(err){
       console.error(err);
+      return sendResponse(res, 500, [], 'internal server error');
     }
-
-
 })
 
 module.exports = comments;
