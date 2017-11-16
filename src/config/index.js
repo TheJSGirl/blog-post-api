@@ -28,7 +28,7 @@ else if(env === 'test'){
     host            : 'localhost',
     user            : 'root',
     password        : 'pinku',
-    database        : 'registerLogin_test'
+    database        : 'Blog_Post'
   }
 }
 module.exports = poolConfig;

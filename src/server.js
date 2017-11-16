@@ -4,9 +4,9 @@ const morgan = require('morgan');
 const cors = require('cors');
 const expressValidator = require('express-validator');
 const routes = require('./routes');
-const {port = 3000} = process.env;
+const port = process.env.PORT || 3000;
 
-//initate app
+//initiate app
 const app = express();
 
 //middleware

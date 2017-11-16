@@ -1,15 +1,17 @@
 const mainRoute = require('express').Router();
-const signUp = require('./signUp');
+const register = require('./register');
 const login = require('./login');
 const {checkAuth, isAdmin} = require('../middlewares');
 const posts = require('./posts');
 const admin = require('./admin');
+const comments = require('./comments');
 
 //middlewares
-mainRoute.use('/signUp', signUp);
+mainRoute.use('/register', register);
 mainRoute.use('/login', login);
-mainRoute.use('/user/', checkAuth, posts);
-mainRoute.use('/post/', checkAuth, isAdmin, admin);
+mainRoute.use('/users/', checkAuth, posts);
+mainRoute.use('/posts/', checkAuth, isAdmin, admin);
+mainRoute.use('/comments', checkAuth,isAdmin, comments);
 
 
 module.exports = mainRoute;

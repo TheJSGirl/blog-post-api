@@ -42,10 +42,12 @@ login.route('/')
       const token = jwt.sign(userDetailForToken, 'abcdefghijklmnop', {expiresIn: 60*60});
       // console.log('your token is:', token);
 
-      return res.header('x-auth', token).status(200).json({
-        status: 'ok',
-        message: 'welcome'
-      });
+      // return res.header('x-auth', token).status(200).json({
+      //   status: 'ok',
+      //   message: 'welcome'
+      // });
+      res.header('x-auth', token);
+      return sendResponse(res, 200, {token}, 'login successful');
       
     }
     catch(err){

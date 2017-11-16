@@ -39,8 +39,8 @@ posts.route('/posts')
 
       console.log(req.body);
     //validate
-    req.checkBody('post_title', 'title is missing').notEmpty();
-    req.checkBody('description', 'description is too short or missing description field').notEmpty()  ;
+    req.checkBody('post_title', 'title is missing').exists();
+    req.checkBody('description', 'description is too short or missing description field').exists()  ;
 
     let errors = req.validationErrors();
     
@@ -66,12 +66,12 @@ posts.route('/posts')
     return sendResponse(res, 200, blogPost, 'successful');
     }
     catch(err){
-      console.log(err);
+      console.error(err);
       return sendResponse(res, 500, [], 'something went wrong');
     }
   })
 
-posts.route('/post/:id')
+posts.route('/posts/:id')
   .get(async (req, res) => {
     //validate id
     req.checkBody('id', 'id is missing').notEmpty();
@@ -118,39 +118,6 @@ posts.route('/post/:id')
     catch(err){
       console.log(err);
       return sendResponse(res, 500, [], 'internal server error');
-    }
-  })
-
-  .post(async (req, res) => {
-    //validate id and comments
-    req.checkBody('id', 'id is missing').notEmpty();
-    req.checkBody('comments', 'comment require').notEmpty().isAlphanumeric();
-    const id = parseInt(req.params.id);
-    const userId = req.user.userId;
-    
-    if(isNaN(id)){
-        return sendResponse(res, 422, [], 'invalid parameters');
-      }
-    
-    const { comments} = req.body;
-    
-    try{
-      
-      commentData = {
-        comments,
-        commentedBy: userId,
-        commentedOn: id
-      }
-
-      //query to insert comment detail in db
-      const [comment] = await pool.query('INSERT INTO comments SET ?', commentData);
-
-      return sendResponse(res, 200, comment, 'commented on post');
-    }
-
-    catch(err){
-      console.log(err);
-      return sendResponse(res, 500, [], 'something went wrong');
     }
   });
 
