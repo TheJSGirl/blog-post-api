@@ -70,4 +70,31 @@ admin.route('/:postId')
 
   })
 
+  .delete(async (req, res) => {
+
+    const postId = parseInt(req.params.postId);    
+    
+    //validate id
+    req.checkBody('postId', 'missing parameters').notEmpty();
+
+    if(isNaN(postId)){
+      return sendResponse(res, 422, [], 'invalid id');
+    }
+
+    const userType = req.user.userType;
+
+    try{
+      if(userType === 1){
+        const [result] = await pool.query(`DELETE FROM blogs WHERE id = ${postId}`);
+
+        return sendResponse(res, 200, [], 'deleted successfully');
+
+      }
+    }
+    catch(err){
+
+    }
+
+  })
+
 module.exports = admin;
