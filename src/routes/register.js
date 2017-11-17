@@ -1,6 +1,5 @@
 const signUp = require('express').Router();
 const pool = require('../db');
-const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const sendResponse = require('../helpers/sendResponse');
 

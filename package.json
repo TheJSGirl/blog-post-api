@@ -1,13 +1,16 @@
 {
   "name": "blog_post",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "assignment task - blog APIs",
+  "main": "src/server.js",
+  "engines": {
+    "node": "8.9.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/server.js"
   },
   "author": "Priyanka",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
@@ -21,6 +24,7 @@
   "devDependencies": {
     "eslint": "^4.11.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "nodemon": "^1.12.1"
   }
 }

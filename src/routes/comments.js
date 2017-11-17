@@ -2,15 +2,15 @@ const comments = require('express').Router();
 const pool = require('../db');
 const { sendResponse } = require('../helpers');
 
-comments.route('/:id')
+comments.route('/:postId')
   .post(async (req, res) => {
-  // validate id and comments
-    req.checkBody('id', 'id is missing').exists();
+  // validate postId and comments
+    req.checkBody('postId', 'id is missing').exists();
     req.checkBody('comments', 'comment require').notEmpty().isAlphanumeric();
-    const id = parseInt(req.params.id, 10);
+    const postId= parseInt(req.params.postId, 10);
     const { userId } = req.user;
 
-    if (isNaN(id)) {
+    if (isNaN(postId)) {
       return sendResponse(res, 422, [], 'invalid parameters');
     }
 
@@ -20,7 +20,7 @@ comments.route('/:id')
       const commentData = {
         comments,
         commentedBy: userId,
-        commentedOn: id,
+        commentedOn: postId,
       };
 
       // query to insert comment detail in db
