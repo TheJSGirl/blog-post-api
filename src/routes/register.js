@@ -25,20 +25,9 @@ signUp.route('/')
         email,
         password: hashedPassword,
       };
-      const [data] = await pool.query('INSERT INTO users SET ? ', userDetail);
+      await pool.query('INSERT INTO users SET ? ', userDetail);
 
-      // check is data is not exists
-      if (!data) {
-        return sendResponse(res, 404, [], 'not found');
-      }
-
-      // check [data] length
-      if (data.length === 0) {
-        return sendResponse(res, 404, [], 'not found');
-      }
-
-
-      return sendResponse(res, 200, data, 'inserted successfully');
+      return sendResponse(res, 200, [], 'Registration successful, please go to /login');
     } catch (err) {
       console.error(err);
       if (err.code === 'ER_DUP_ENTRY') {
