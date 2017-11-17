@@ -17,19 +17,19 @@ admin.route('/:postId')
 
     const userId = req.user.id;
     const userType = req.user.userType;
-    const {post_title, description} = req.body;
+    const {postTitle, description} = req.body;
     const updateValues = [];
     
 
-    //check if post_title or description is empty
-    if(!post_title && !description){
+    //check if postTitle or description is empty
+    if(!postTitle && !description){
       return sendResponse(res, 422, [], 'missing parameters');
     }
 
-    if(post_title){
-      //check post_title length should be greater than zero if true then updateValues
-      if(post_title.length > 0){
-        updateValues.push(`post_title = '${post_title}'`);
+    if(postTitle){
+      //check postTitle length should be greater than zero if true then updateValues
+      if(postTitle.length > 0){
+        updateValues.push(`postTitle = '${postTitle}'`);
       }
     }
 

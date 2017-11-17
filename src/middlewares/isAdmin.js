@@ -9,7 +9,7 @@ const isAdmin = (req, res, next) => {
   if(req.user.userType !== 1){
     return sendResponse(res, 422, [], 'user not authorised');
   }
-  next();
+  return next();
 }
 
 module.exports = isAdmin;

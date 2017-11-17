@@ -4,11 +4,41 @@ const {sendResponse} = require('../helpers');
 
 posts.route('/posts')
   .get(async(req, res) => {
+    req.check('limit', 'limit should be int').exists().isInt().optional();
+    req.check('offset', 'offset should be int').exists().isInt().optional();
+    req.check('searchBy', 'searchBy should be present').exists().isLength({min: 3}).optional();
+    req.check('keyword', 'keyword should be present').exists().isLength({min: 3}).optional();
+
+    let errors = req.validationErrors();
+    
+    if(errors){
+      return sendResponse(res, 422, [], errors[0].msg);
+    }
+
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+    const searchBy = req.query.searchBy;
+    const keyword = req.query.keyword;
     try{
-      const [data] = await pool.query('SELECT blogs.id, post_title, description, userName, createdAt from blogs INNER JOIN users on blogs.createdBy= users.id ');
+      //get all posts
+      let getQuery = 'SELECT b.id, b.postTitle, b.description, u.userName AS author, b.createdAt FROM blogs b INNER JOIN users u ON b.createdBy = u.id';
+
+      //concatenate query with getQuery to get author posts  
+      if(searchBy && keyword){
+        getQuery += ` WHERE ${searchBy} LIKE '%${keyword}'`;
+      }
+
+      //concatenate query with getQuery to get posts in limit       
+      if(limit && offset){
+        getQuery += ` LIMIT ${limit} OFFSET ${offset}`;
+      }
+
+      // console.log(getQuery);
+
+      const [data] = await pool.query(getQuery);
       // console.log(data);
       if(data.length === 0){
-        return sendResponse(res, 404, [], 'not found');
+        return sendResponse(res, 200, [], 'fetched all posts');
       } 
 
       //comments query on post
@@ -25,7 +55,17 @@ posts.route('/posts')
     
       //execute query and get comments on a particular post
       const [comments] = await pool.query(commentQuery);
-      data.push(comments);
+      
+      data.forEach((post) => {
+        const tempArr = [];
+        comments.forEach((comment) => {
+          if(comment.commentedOn === post.id){
+            tempArr.push(comment);
+          }
+        });
+        post.comments = tempArr;
+        post.commentCount = tempArr.length;
+      });
 
       return sendResponse(res, 200, data, 'successful');
     } 
@@ -39,7 +79,7 @@ posts.route('/posts')
 
       console.log(req.body);
     //validate
-    req.checkBody('post_title', 'title is missing').exists();
+    req.checkBody('postTitle', 'title is missing').exists();
     req.checkBody('description', 'description is too short or missing description field').exists()  ;
 
     let errors = req.validationErrors();
@@ -52,11 +92,11 @@ posts.route('/posts')
     //check the loggedin user
     const userId = req.user.userId;
 
-    const {post_title, description} = req.body;
+    const {postTitle, description} = req.body;
     
     //object of post
      const post = {
-      post_title,
+      postTitle,
       createdBy: userId,
       description
     }
@@ -84,7 +124,7 @@ posts.route('/posts/:id')
   
     try{
       // postDetail query of post
-      const query = `SELECT b.post_title, b.description, b.createdAt as timeOfPost, u.userName
+      const query = `SELECT b.postTitle, b.description, b.createdAt as timeOfPost, u.userName
       FROM 
       blogs as b 
       INNER JOIN users as u  

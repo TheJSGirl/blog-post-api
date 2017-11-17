@@ -13,7 +13,7 @@ CREATE TABLE `users` (
 -- create statement of blogs Table
 CREATE TABLE `blogs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `post_title` varchar(200) DEFAULT NULL,
+  `postTitle` varchar(200) DEFAULT NULL,
   `createdBy` int(11) NOT NULL,
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `description` varchar(250) NOT NULL,
