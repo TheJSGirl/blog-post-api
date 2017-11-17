@@ -16,6 +16,11 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
+app.use((req, res, next) => {
+  // Expose the custom headers so that browser can allow to use it
+  res.setHeader('Access-Control-Expose-Headers','X-Powered-By, X-Auth');
+  next();
+});
 
 // route middleware
 app.use('/api', routes);
