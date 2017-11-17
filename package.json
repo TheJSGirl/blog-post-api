@@ -10,7 +10,7 @@
     "start": "src/server.js",
     "dev": "nodemon src/server.js"
   },
-  "author": "Priyanka",
+  "author": "Priyanka Negi",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^1.0.3",
