@@ -7,7 +7,7 @@ const isAdmin = (req, res, next) => {
   }
   // check user is admin or not
   if (req.user.userType !== 1) {
-    return sendResponse(res, 422, [], 'user not authorised');
+    return sendResponse(res, 400, [], 'user not authorised');
   }
   return next();
 };

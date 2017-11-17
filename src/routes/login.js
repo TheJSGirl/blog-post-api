@@ -7,13 +7,12 @@ const jwt = require('jsonwebtoken');
 login.route('/')
   .post(async (req, res) => {
     // validate userName and password
-    req.checkBody('userName', 'userName require').notEmpty().isLength({ min: 4 });
-    req.checkBody('password', 'too short password').notEmpty().isLength({ min: 5 });
+    req.check('userName', 'userName require/min 5 chars long').exists().isLength({ min: 5 });
+    req.check('password', 'too short password').exists().isLength({ min: 5 });
 
     const errors = req.validationErrors();
-
     if (errors) {
-      return sendResponse(res, 422, [], errors[0].msg);
+      return sendResponse(res, 400, [], errors[0].msg);
     }
 
     // get userName and password from req.body by destructuring

@@ -9,9 +9,8 @@ const comments = require('./comments');
 // middlewares
 mainRoute.use('/register', register);
 mainRoute.use('/login', login);
-mainRoute.use('/users/', checkAuth, posts);
-mainRoute.use('/posts/', checkAuth, isAdmin, admin);
-mainRoute.use('/comments', checkAuth, isAdmin, comments);
-
+mainRoute.use('/posts', checkAuth, posts);
+mainRoute.use('/posts', checkAuth, comments);
+mainRoute.use('/admin', checkAuth, isAdmin, admin);
 
 module.exports = mainRoute;

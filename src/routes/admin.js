@@ -1,89 +1,90 @@
-const admin = require('express').Router();
+const adminRoute = require('express').Router();
 const { sendResponse } = require('../helpers');
 const pool = require('../db');
 
 
-admin.route('/:postId')
-  .patch(async (req, res) => {
+adminRoute.route('/posts/:postId').patch(async (req, res) => {
+  try {
     // validate postId
-    req.checkBody('postId', 'post id is required').notEmpty();
-    const postId = parseInt(req.params.postId, 10);
-
-    // check if postId is not a number
-    if (isNaN(postId)) {
-      return sendResponse(res, 422, [], 'invalid parameters');
+    req.check('postId', 'post id is required').exists().isInt();
+    req.check('postTitle', 'postTitle is required/minimum 3 chars').optional().isLength({ min: 3 });
+    req.check('description', 'description is required/minimum 3 chars').optional().isLength({ min: 3 });
+    
+    const errors = req.validationErrors();
+    if (errors) {
+      return sendResponse(res, 400, [], 'missing post info');
     }
 
-    // const userId = req.user.id;
-    const { userType } = req.user;
-    const { postTitle, description } = req.body;
-    const updateValues = [];
+    const postId = parseInt(req.params.postId, 10);
 
+    const { postTitle, description } = req.body;
+    const updateValues = []; // to store update values, if any
 
     // check if postTitle or description is empty
     if (!postTitle && !description) {
-      return sendResponse(res, 422, [], 'missing parameters');
+      return sendResponse(res, 200, [], 'nothing to update');
     }
 
     if (postTitle) {
-      // check postTitle length should be greater than zero if true then updateValues
-      if (postTitle.length > 0) {
-        updateValues.push(`postTitle = '${postTitle}'`);
-      }
+      updateValues.push(`postTitle = '${postTitle}'`);
     }
-
 
     if (description) {
-      // check description length should be greater than zero if true then updateValues
-      if (description.length > 0) {
-        updateValues.push(`description = '${description}' `);
-      }
-    }
-    // set updateQuery
-    let updateQuery = 'UPDATE blogs SET ';
-
-    // if updateValues length is greater than zero then join both updateValues with join method
-    if (updateValues.length > 0) {
-      updateQuery += updateValues.join();
-    }
-    // set where clause to updateQuery
-    updateQuery += `WHERE id = '${postId}'`;
-
-    // console.log(updateQuery);
-
-    try {
-      if (userType === 1) {
-        // execute query to update the fields
-        const [result] = await pool.query(updateQuery);
-        return sendResponse(res, 200, result, 'updated successfully');
-      }
-    } catch (err) {
-      console.error(err);
-      return sendResponse(res, 500, [], 'internal server error');
-    }
-  })
-  .delete(async (req, res) => {
-    const postId = parseInt(req.params.postId, 10);
-
-    // validate id
-    req.checkBody('postId', 'missing parameters').notEmpty();
-
-    if (isNaN(postId)) {
-      return sendResponse(res, 422, [], 'invalid id');
+      updateValues.push(`description = '${description}' `);
     }
 
-    const { userType } = req.user;
-
-    try {
-      if (userType === 1) {
-        const [result] = await pool.query(`DELETE FROM blogs WHERE id = ${postId}`);
-        return sendResponse(res, 200, result, 'deleted successfully');
-      }
-      return sendResponse(res, 403, [], 'you are not allowed to perform this action');
-    } catch (err) {
-      console.error(err);
-      return sendResponse(res, 500, [], 'internal server error');
+    if (updateValues.length) {
+      // if there is any value to update then only execute sql query
+      const updateQuery = `UPDATE blogs SET ${updateValues.join()} WHERE id = ?`;
+      await pool.query(updateQuery, postId);
     }
-  });
 
-module.exports = admin;
+    return sendResponse(res, 200, [], 'updated successfully');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'internal server error');
+  }
+});
+
+// admin deletes posts using postId
+adminRoute.route('/posts/:postId').delete(async (req, res) => {
+  // validate id
+  req.check('postId', 'missing parameters').exists().isInt();
+  const errors = req.validationErrors();
+  if (errors) {
+    return sendResponse(res, 400, [], errors[0].msg);
+  }
+
+  const postId = parseInt(req.params.postId, 10);
+
+  try {
+    await pool.query('DELETE FROM blogs WHERE id = ?', postId);
+    return sendResponse(res, 200, [], 'deleted successfully');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'internal server error');
+  }
+});
+
+// admin deletes comments using commentId
+adminRoute.route('/posts/:postId/comments/:commentId').delete(async (req, res) => {
+  // validate id
+  req.check('commentId', 'missing comment info').exists().isInt();
+  const errors = req.validationErrors();
+  if (errors) {
+    return sendResponse(res, 400, [], errors[0].msg);
+  }
+
+  const { commentId } = req.params;
+
+  try {
+    await pool.query('DELETE FROM comments WHERE id= ?', commentId);
+    return sendResponse(res, 200, [], 'comment deleted successfully');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'internal server error');
+  }
+});
+
+
+module.exports = adminRoute;

@@ -1,159 +1,136 @@
-const posts = require('express').Router();
+const postRoute = require('express').Router();
 const pool = require('../db');
 const { sendResponse } = require('../helpers');
 
-posts.route('/posts')
-  .get(async (req, res) => {
-    req.check('limit', 'limit should be int').exists().isInt().optional();
-    req.check('offset', 'offset should be int').exists().isInt().optional();
-    req.check('searchBy', 'searchBy should be present').exists().isLength({ min: 3 }).optional();
-    req.check('keyword', 'keyword should be present').exists().isLength({ min: 3 }).optional();
+postRoute.route('/').get(async (req, res) => {
+  req.check('limit', 'limit should be int').exists().isInt().optional();
+  req.check('offset', 'offset should be int').exists().isInt().optional();
+  req.check('searchBy', 'searchBy should be present').exists().isLength({ min: 3 }).optional();
+  req.check('keyword', 'keyword should be present').exists().isLength({ min: 3 }).optional();
 
-    const errors = req.validationErrors();
+  const errors = req.validationErrors();
 
-    if (errors) {
-      return sendResponse(res, 422, [], errors[0].msg);
+  if (errors) {
+    return sendResponse(res, 400, [], errors[0].msg);
+  }
+
+  const { limit } = req.query;
+  const { offset } = req.query;
+  const { searchBy } = req.query;
+  const { keyword } = req.query;
+  try {
+    // get all posts
+    let getQuery = 'SELECT b.id, b.postTitle, b.description, u.userName AS author, b.createdAt FROM blogs b INNER JOIN users u ON b.createdBy = u.id';
+
+    // concatenate query with getQuery to get author posts
+    if (searchBy && keyword) {
+      getQuery += ` WHERE ${searchBy} LIKE '%${keyword}'`;
     }
 
-    const { limit } = req.query;
-    const { offset } = req.query;
-    const { searchBy } = req.query;
-    const { keyword } = req.query;
-    try {
-      // get all posts
-      let getQuery = 'SELECT b.id, b.postTitle, b.description, u.userName AS author, b.createdAt FROM blogs b INNER JOIN users u ON b.createdBy = u.id';
+    // concatenate query with getQuery to get posts in limit
+    if (limit && offset) {
+      getQuery += ` LIMIT ${limit} OFFSET ${offset}`;
+    }
 
-      // concatenate query with getQuery to get author posts
-      if (searchBy && keyword) {
-        getQuery += ` WHERE ${searchBy} LIKE '%${keyword}'`;
-      }
+    // console.log(getQuery);
 
-      // concatenate query with getQuery to get posts in limit
-      if (limit && offset) {
-        getQuery += ` LIMIT ${limit} OFFSET ${offset}`;
-      }
+    const [data] = await pool.query(getQuery);
+    // console.log(data);
+    if (data.length === 0) {
+      return sendResponse(res, 200, [], 'fetched all posts');
+    }
 
-      // console.log(getQuery);
+    // comments query on post
+    const commentQuery = 'SELECT c.id as commentId, c.comments,c.commentedOn, c.createdAt, u.userName as commentedBy FROM comments c INNER JOIN blogs ON c.commentedOn = blogs.id INNER JOIN users  u ON c.commentedBy = u.id';
 
-      const [data] = await pool.query(getQuery);
-      // console.log(data);
-      if (data.length === 0) {
-        return sendResponse(res, 200, [], 'fetched all posts');
-      }
+    // execute query and get comments on a particular post
+    const [comments] = await pool.query(commentQuery);
 
-      // comments query on post
-      const commentQuery = `SELECT c.comments,c.commentedOn, c.createdAt, u.userName as commentedBy
-      FROM comments as c 
-      INNER JOIN 
-      blogs 
-      ON 
-      c.commentedOn = blogs.id 
-      INNER JOIN
-      users as u 
-      ON 
-      c.commentedBy = u.id`;
-
-      // execute query and get comments on a particular post
-      const [comments] = await pool.query(commentQuery);
-
-      data.forEach((post) => {
-        const tempArr = [];
-        comments.forEach((comment) => {
-          if (comment.commentedOn === post.id) {
-            tempArr.push(comment);
-          }
-        });
-        post.comments = tempArr;
-        post.commentCount = tempArr.length;
+    data.forEach((post) => {
+      const tempArr = [];
+      comments.forEach((comment) => {
+        if (comment.commentedOn === post.id) {
+          tempArr.push(comment);
+        }
       });
+      post.comments = tempArr;
+      post.commentCount = tempArr.length;
+    });
 
-      return sendResponse(res, 200, data, 'successful');
-    } catch (err) {
-      console.error(err);
-      return sendResponse(res, 500, [], 'internal server error');
-    }
-  })
-  .post(async (req, res) => {
-    console.log(req.body);
-    // validate
-    req.checkBody('postTitle', 'title is missing').exists();
-    req.checkBody('description', 'description is too short or missing description field').exists();
+    return sendResponse(res, 200, data, 'successful');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'internal server error');
+  }
+});
 
-    const errors = req.validationErrors();
+postRoute.route('/').post(async (req, res) => {
+  console.log(req.body);
+  // validate
+  req.checkBody('postTitle', 'title is missing').exists();
+  req.checkBody('description', 'description is too short or missing description field').exists();
 
-    if (errors) {
-      return sendResponse(res, 422, [], errors[0].msg);
-    }
+  const errors = req.validationErrors();
 
-    try {
+  if (errors) {
+    return sendResponse(res, 400, [], errors[0].msg);
+  }
+
+  try {
     // get loggedin userId
-      const { userId } = req.user;
+    const { userId } = req.user;
 
-      const { postTitle, description } = req.body;
+    const { postTitle, description } = req.body;
 
-      // object of post
-      const post = {
-        postTitle,
-        createdBy: userId,
-        description,
-      };
+    // object of post
+    const post = {
+      postTitle,
+      createdBy: userId,
+      description,
+    };
 
-      const [blogPost] = await pool.query('INSERT INTO blogs SET ? ', post);
+    await pool.query('INSERT INTO blogs SET ? ', post);
 
-      return sendResponse(res, 200, blogPost, 'successful');
-    } catch (err) {
-      console.error(err);
-      return sendResponse(res, 500, [], 'something went wrong');
-    }
-  });
+    return sendResponse(res, 200, [], 'posted successful');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'something went wrong');
+  }
+});
 
-posts.route('/posts/:id')
-  .get(async (req, res) => {
-    // validate id
-    req.checkBody('id', 'id is missing').notEmpty();
+postRoute.route('/:postId').get(async (req, res) => {
+  // validate id
+  req.check('postId', 'postId is missing').exists().isInt();
+  const errors = req.validationErrors();
+  if (errors) {
+    return sendResponse(res, 400, [], errors[0].msg);
+  }
 
-    const id = parseInt(req.params.id);
-    // const id = req.params.id;
-    if (isNaN(id)) {
-      return sendResponse(res, 422, [], 'invalid parameters');
-    }
+  const postId = parseInt(req.params.postId, 10);
 
-    try {
-      // postDetail query of post
-      const query = `SELECT b.postTitle, b.description, b.createdAt as timeOfPost, u.userName
-      FROM 
-      blogs as b 
-      INNER JOIN users as u  
-      ON
-      b.id = u.id
-      where b.id =${id}`;
+  try {
+    // postDetail query of post
+    const query = `SELECT b.postTitle, b.description, b.createdAt as timeOfPost, u.userName
+      FROM blogs b INNER JOIN users u  ON b.createdBy = u.id WHERE b.id = ?`;
 
       // execute query and get postDetail array
-      const [postDetail] = await pool.query(query);
+    const [postDetail] = await pool.query(query, postId);
 
-      if (postDetail.length === 0) {
-        return sendResponse(res, 404, [], 'not found');
-      }
-
-      // comments query on post
-      const commentQuery = `SELECT c.comments, c.createdAt, u.userName as commentedBy
-      FROM comments as c 
-      INNER JOIN 
-      blogs 
-      ON 
-      c.commentedOn = blogs.id 
-      INNER JOIN
-      users as u ON c.commentedBy = u.id
-      where blogs.id =${id}`;
-
-      // execute query and get comments on a particular post
-      const [comments] = await pool.query(commentQuery);
-      postDetail.push(comments);
-      return sendResponse(res, 200, postDetail, 'successful');
-    } catch (err) {
-      console.error(err);
-      return sendResponse(res, 500, [], 'internal server error');
+    if (postDetail.length === 0) {
+      return sendResponse(res, 404, [], 'not found');
     }
-  });
 
-module.exports = posts;
+    // comments query on post
+    const commentQuery = `SELECT c.id as commentId, c.comments, c.createdAt, u.userName as commentedBy, u.id AS userId FROM comments  c INNER JOIN blogs b ON c.commentedOn = b.id INNER JOIN users u ON c.commentedBy = u.id WHERE b.id = ${postId}`;
+
+    // execute query and get comments on a particular post
+    const [comments] = await pool.query(commentQuery, postId);
+    postDetail[0].comments = comments;
+    return sendResponse(res, 200, postDetail, 'successful');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 500, [], 'internal server error');
+  }
+});
+
+module.exports = postRoute;
