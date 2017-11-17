@@ -3,5 +3,5 @@ const isAdmin = require('./isAdmin');
 
 module.exports = {
   checkAuth,
-  isAdmin
-}
+  isAdmin,
+};

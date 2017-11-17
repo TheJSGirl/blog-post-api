@@ -1,5 +1,5 @@
-  const sendResponse = require('./sendResponse');
+const sendResponse = require('./sendResponse');
 
-  module.exports = {
-    sendResponse
-  }
+module.exports = {
+  sendResponse,
+};
