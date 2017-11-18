@@ -77,9 +77,9 @@
 
 **Note:** this endpoint contains params. 
 - If you want posts in limit then sent 2 query params like : 
-  - /api/posts?limit=5&offset=5
+  - ```/api/posts?limit=5&offset=5```
 - If you want to search for posts by userName name, the endpoint will be like:
-  - /api/posts?searchBy=userName&keyword=john
+  - ```/api/posts?searchBy=userName&keyword=john```
 
 **Response from API :**
 ``` javascript
@@ -162,7 +162,7 @@
 { "x-auth" : "XXXXXX" // JWT token get when you logged in}
 ```
   
-**Request Body** :
+**Request Body** : comment
 ```javascript
 {
   "comment" : "sample comment"
