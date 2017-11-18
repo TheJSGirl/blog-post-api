@@ -2,13 +2,13 @@
   "name": "blog_post",
   "version": "1.0.0",
   "description": "assignment task - blog APIs",
-  "main": "src/server.js",
+  "main": "./app/server.js",
   "engines": {
     "node": "8.9.0"
   },
   "scripts": {
     "start": "node ./app/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon"
   },
   "author": "Priyanka Negi",
   "license": "MIT",
@@ -19,6 +19,7 @@
     "express": "^4.16.2",
     "express-validator": "^4.3.0",
     "jsonwebtoken": "^8.1.0",
+    "log4js": "^2.3.12",
     "morgan": "^1.9.0",
     "mysql2": "^1.5.0"
   },
@@ -29,3 +30,4 @@
     "nodemon": "^1.12.1"
   }
 }
+
