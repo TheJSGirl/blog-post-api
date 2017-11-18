@@ -22,6 +22,17 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'successful',
+    data: {
+      register: 'Go to /register',
+      login: 'Go to /login',
+      api_docs: 'Find the api docs here: https://github.com/TheJSGirl/Blogging-app',
+    },
+    message: 'Welcome to blogging-app-api',
+  });
+});
 // route middleware
 app.use('/api', routes);
 
