@@ -37,7 +37,7 @@ postRoute.route('/').get(async (req, res) => {
     const [data] = await pool.query(getQuery);
     // console.log(data);
     if (data.length === 0) {
-      return sendResponse(res, 200, [], 'fetched all posts');
+      return sendResponse(res, 404, [], 'not found');
     }
 
     // comments query on post

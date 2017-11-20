@@ -21,6 +21,9 @@ login.route('/')
     try {
       const [result] = await pool.query(`SELECT id, password, userType FROM users where userName = '${userName}'`);
 
+      if (result.length === 0) {
+        return sendResponse(res, 404, [], 'user not found');
+      }
       const passwordFromDb = result[0].password;
 
       // console.log(passwordFromDb);
