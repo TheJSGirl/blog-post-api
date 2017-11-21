@@ -2,6 +2,7 @@
 #### Live here: https://blogging-post-app.herokuapp.com/
 
 ### Read about APIs here : [docs](./DOCUMENTATION.md)
+### The Database Schema is here : [Create Statements](./DatabaseSchema.md)
 
 ## Tech Stack
 - Node JS
