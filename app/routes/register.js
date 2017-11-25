@@ -2,6 +2,7 @@ const signUp = require('express').Router();
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const sendResponse = require('../helpers/sendResponse');
+cosnt jwt = require('jsonwebtoken');
 
 
 signUp.route('/').post(async (req, res) => {
@@ -26,8 +27,21 @@ signUp.route('/').post(async (req, res) => {
       password: hashedPassword,
     };
 
-    await pool.query('INSERT INTO users SET ? ', userDetail);
-    return sendResponse(res, 200, [], 'Registration successful, please go to /login');
+    const [newUser] = await pool.query('INSERT INTO users SET ? ', userDetail);
+
+    const userDetail = {
+      userId: newUser.insertId,
+      userType: 0
+    }
+
+    //generate token
+    const token = jwt.sign(userDetail, process.env.JWT_SECRET, { expiredIn: process.env.JWT_EXPIRY _});
+    //set token in response headers
+    res.header('x-auth', token);
+    
+    return sendResponse(res, 200, { token }, 'Registration successful');
+
+  
   } catch (err) {
     console.error(err);
     if (err.code === 'ER_DUP_ENTRY') {
