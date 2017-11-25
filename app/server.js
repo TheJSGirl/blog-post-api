@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     data: {
       register: 'Go to /register',
       login: 'Go to /login',
-      api_docs: 'Find the api docs here: https://github.com/TheJSGirl/Blogging-app',
+      api_docs: 'Find the api docs here: https://github.com/TheJSGirl/blog-post-api',
     },
     message: 'Welcome to blog-post-api',
   });
