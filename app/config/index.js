@@ -20,7 +20,7 @@ if (env === 'development') {
     host: 'localhost',
     user: 'root',
     password: 'pinku',
-    database: 'registerLogin',
+    database: 'blog_post',
   };
 } else if (env === 'test') {
   poolConfig = {
@@ -28,7 +28,7 @@ if (env === 'development') {
     host: 'localhost',
     user: 'root',
     password: 'pinku',
-    database: 'registerLogin_test',
+    database: 'blog_post_test',
   };
 }
 
