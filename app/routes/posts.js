@@ -20,7 +20,7 @@ postRoute.route('/').get(async (req, res) => {
   const { keyword } = req.query;
   try {
     // get all posts
-    let getQuery = 'SELECT b.id, b.postTitle, b.description, u.userName AS author, b.createdAt FROM blogs b INNER JOIN users u ON b.createdBy = u.id';
+    let getQuery = 'SELECT b.id, b.postTitle, b.description, u.username AS author, b.createdAt FROM blogs b INNER JOIN users u ON b.createdBy = u.id';
 
     // concatenate query with getQuery to get author posts
     if (searchBy && keyword) {
@@ -41,7 +41,7 @@ postRoute.route('/').get(async (req, res) => {
     }
 
     // comments query on post
-    const commentQuery = 'SELECT c.id as commentId, c.comments,c.commentedOn, c.createdAt, u.userName as commentedBy FROM comments c INNER JOIN blogs ON c.commentedOn = blogs.id INNER JOIN users  u ON c.commentedBy = u.id';
+    const commentQuery = 'SELECT c.id as commentId, c.comments,c.commentedOn, c.createdAt, u.username as commentedBy FROM comments c INNER JOIN blogs ON c.commentedOn = blogs.id INNER JOIN users  u ON c.commentedBy = u.id';
 
     // execute query and get comments on a particular post
     const [comments] = await pool.query(commentQuery);
@@ -110,7 +110,7 @@ postRoute.route('/:postId').get(async (req, res) => {
 
   try {
     // postDetail query of post
-    const query = `SELECT b.postTitle, b.description, b.createdAt as timeOfPost, u.userName
+    const query = `SELECT b.postTitle, b.description, b.createdAt as timeOfPost, u.username
       FROM blogs b INNER JOIN users u  ON b.createdBy = u.id WHERE b.id = ?`;
 
       // execute query and get postDetail array
@@ -121,7 +121,7 @@ postRoute.route('/:postId').get(async (req, res) => {
     }
 
     // comments query on post
-    const commentQuery = `SELECT c.id as commentId, c.comments, c.createdAt, u.userName as commentedBy, u.id AS userId FROM comments  c INNER JOIN blogs b ON c.commentedOn = b.id INNER JOIN users u ON c.commentedBy = u.id WHERE b.id = ${postId}`;
+    const commentQuery = `SELECT c.id as commentId, c.comments, c.createdAt, u.username as commentedBy, u.id AS userId FROM comments  c INNER JOIN blogs b ON c.commentedOn = b.id INNER JOIN users u ON c.commentedBy = u.id WHERE b.id = ${postId}`;
 
     // execute query and get comments on a particular post
     const [comments] = await pool.query(commentQuery, postId);

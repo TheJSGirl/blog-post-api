@@ -5,11 +5,11 @@
 ### Register / Login
 
 ### POST /api/register : Create a new account
-**Request Body** - userName, email, password
+**Request Body** - username, email, password
 <br>**Note:** username/password should be minimum 5 chars long
 ``` javascript 
 {
-  "userName" : "john",
+  "username" : "john",
   "email" : "john2131@gmail.com",
   "password" : "12345"
 }
@@ -24,11 +24,11 @@
 ```
 
 ### POST /api/login : Login with credentials
-**Request Body** : userName and password
+**Request Body** : username and password
   
 ``` javascript
 {
-  "userName" : "john" ,
+  "username" : "john" ,
   "password" : "12345"
 }
 ```
@@ -78,8 +78,8 @@
 **Note:** this endpoint contains params. 
 - If you want posts in limit then sent 2 query params like : 
   - ```/api/posts?limit=5&offset=5```
-- If you want to search for posts by userName name, the endpoint will be like:
-  - ```/api/posts?searchBy=userName&keyword=john```
+- If you want to search for posts by username name, the endpoint will be like:
+  - ```/api/posts?searchBy=username&keyword=john```
 
 **Response from API :**
 ``` javascript
@@ -132,7 +132,7 @@
             "postTitle": "Programming",
             "description": "A programming language is, as the name would suggest, a language developed to express programs. All computers have a native programming language that they understand, commonly referred to as machine code. ",
             "timeOfPost": "2017-11-16T10:54:43.000Z",
-            "userName": "bail",
+            "username": "bail",
             "comments": [
                 {
                     "comments": "i will folow this link",

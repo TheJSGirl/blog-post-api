@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 
 login.route('/')
   .post(async (req, res) => {
-    // validate userName and password
-    req.check('userName', 'userName require/min 5 chars long').exists().isLength({ min: 5 });
+    // validate username and password
+    req.check('username', 'username require/min 5 chars long').exists().isLength({ min: 5 });
     req.check('password', 'too short password').exists().isLength({ min: 5 });
 
     const errors = req.validationErrors();
@@ -15,11 +15,11 @@ login.route('/')
       return sendResponse(res, 400, [], errors[0].msg);
     }
 
-    // get userName and password from req.body by destructuring
-    const { userName, password } = req.body;
+    // get username and password from req.body by destructuring
+    const { username, password } = req.body;
 
     try {
-      const [result] = await pool.query(`SELECT id, password, userType FROM users where userName = '${userName}'`);
+      const [result] = await pool.query(`SELECT id, password, userType FROM users where username = '${username}'`);
 
       if (result.length === 0) {
         return sendResponse(res, 404, [], 'user not found');
