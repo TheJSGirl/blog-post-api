@@ -7,9 +7,9 @@ const sendResponse = require('../helpers/sendResponse');
 signUp.route('/').post(async (req, res) => {
   try {
     // validate by using express-validator
-    req.check('username', 'must required username').exists().isLength({ min: 5 });
+    req.check('username', 'username is required/ minimum 5 characters').exists().isLength({ min: 5 });
     req.check('email', 'invalid email').exists().isEmail();
-    req.check('password', 'too short password').exists().isLength({ min: 5 });
+    req.check('password', 'too short password/ minimum 5 characters').exists().isLength({ min: 5 });
 
     const errors = req.validationErrors();
     if (errors) {
