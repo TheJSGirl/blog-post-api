@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
       login: 'Go to /login',
       api_docs: 'Find the api docs here: https://github.com/TheJSGirl/Blogging-app',
     },
-    message: 'Welcome to blogging-app-api',
+    message: 'Welcome to blog-post-api',
   });
 });
 // route middleware
