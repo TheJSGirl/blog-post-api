@@ -2,7 +2,7 @@ const signUp = require('express').Router();
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const sendResponse = require('../helpers/sendResponse');
-cosnt jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 
 signUp.route('/').post(async (req, res) => {
@@ -29,13 +29,13 @@ signUp.route('/').post(async (req, res) => {
 
     const [newUser] = await pool.query('INSERT INTO users SET ? ', userDetail);
 
-    const userDetail = {
+    const userData = {
       userId: newUser.insertId,
       userType: 0
     }
 
     //generate token
-    const token = jwt.sign(userDetail, process.env.JWT_SECRET, { expiredIn: process.env.JWT_EXPIRY _});
+    const token = jwt.sign(userData, process.env.JWT_SECRET, { expiredIn: process.env.JWT_EXPIRY });
     //set token in response headers
     res.header('x-auth', token);
     
