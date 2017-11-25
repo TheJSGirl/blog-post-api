@@ -1,5 +1,5 @@
 # Blog Post API
-#### Live here: https://blogging-post-app.herokuapp.com/
+#### Live here: https://blog-post-api.herokuapp.com/
 
 ### Read about APIs here : [docs](./DOCUMENTATION.md)
 ### The Database Schema is here : [Create Statements](./DatabaseSchema.md)
