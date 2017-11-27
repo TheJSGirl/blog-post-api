@@ -30,7 +30,7 @@ login.route('/')
       const isValidPassword = await bcrypt.compare(password, passwordFromDb);
 
       if (!isValidPassword) {
-        return sendResponse(res, 401, [], 'Failed to authenticate');
+        return sendResponse(res, 401, [], 'Failed to authenticate, error in username/password');
       }
 
       const userDetailForToken = {
