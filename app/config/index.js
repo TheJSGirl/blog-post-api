@@ -1,6 +1,6 @@
 const env = process.env.NODE_ENV || 'development';
 process.env.JWT_SECRET = 'thisisasimplesecreat';
-process.env.JWT_EXPIRY = ((1 * 24) * 60) * 60;
+process.env.JWT_EXPIRY = '1d';
 
 let poolConfig = null;
 if (env === 'production') {
