@@ -11,7 +11,7 @@ const checkAuth = async (req, res, next) => {
 
   try {
     // decode token
-    const decode = await jwt.verify(token, 'abcdefghijklmnop');
+    const decode = await jwt.verify(token, process.env.JWT_SECRET);
     console.log(decode);
     req.user = decode;
     next();
@@ -19,9 +19,13 @@ const checkAuth = async (req, res, next) => {
     console.log(err);
     // validate if token expired
     if (err.name === 'TokenExpiredError') {
-      return sendResponse(res, 401, [], 'token expired');
+      return sendResponse(res, 401, [], 'Token Expired');
     }
-    return sendResponse(res, 500, [], 'something went wrong');
+    
+    if (err.name === 'JsonWebTokenError') {
+      return sendResponse(res, 401, [], 'Invalid Token');
+    }
+    return sendResponse(res, 500, [], 'Something went wrong');
   }
 };
 
