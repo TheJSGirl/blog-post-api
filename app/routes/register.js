@@ -35,7 +35,7 @@ signUp.route('/').post(async (req, res) => {
     }
 
     //generate token
-    const token = jwt.sign(userData, process.env.JWT_SECRET, { expiredIn: process.env.JWT_EXPIRY });
+    const token = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY });
     //set token in response headers
     res.header('x-auth', token);
     
