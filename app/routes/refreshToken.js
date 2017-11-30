@@ -28,6 +28,7 @@ refreshTokenRoute.post('/refresh', async (req, res) => {
     );
 
     res.header('x-auth', token);
+    res.header('x-auth-refresh', refreshToken);
     sendResponse(res, 200, { newToken, refreshToken }, 'Generated new token');
   } catch (error) {
     return sendResponse(res, 500, [], 'internal server error');
