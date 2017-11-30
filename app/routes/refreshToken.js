@@ -5,7 +5,7 @@ const { sendResponse } = require('../helpers');
 
 refreshTokenRoute.post('/', async (req, res) => {
   try {
-    req.check('refreshToken', 'token should be present').exists().isInt().optional();
+    req.check('refreshToken', 'token should be present').exists();
 
     const errors = req.validationErrors();
     if (errors) {
@@ -14,8 +14,9 @@ refreshTokenRoute.post('/', async (req, res) => {
 
     const oldRefreshToken = req.body.refreshToken;
     // get the token contents
-    const decode = await jwt.verify(oldRefreshToken, process.env.JWT_SECRET);
-
+    const decode = await jwt.verify(oldRefreshToken, process.env.JWT_SECRET_REFRESH);
+    delete decode.iat;
+    delete decode.exp;
     // generate token
     const token = jwt.sign(
       decode,
@@ -29,7 +30,7 @@ refreshTokenRoute.post('/', async (req, res) => {
 
     res.header('x-auth', token);
     res.header('x-auth-refresh', refreshToken);
-    sendResponse(res, 200, { token, refreshToken }, 'Generated new token');
+    sendResponse(res, 200, { token, refreshToken }, 'Generated new tokens');
   } catch (error) {
     console.log(error);
     if (error.name === 'TokenExpiredError') {
