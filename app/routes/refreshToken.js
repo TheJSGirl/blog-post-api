@@ -31,6 +31,14 @@ refreshTokenRoute.post('/refresh', async (req, res) => {
     res.header('x-auth-refresh', refreshToken);
     sendResponse(res, 200, { token, refreshToken }, 'Generated new token');
   } catch (error) {
+    console.log(error);
+    if (error.name === 'TokenExpiredError') {
+      return sendResponse(res, 401, [], 'Token Expired');
+    }
+
+    if (error.name === 'JsonWebTokenError') {
+      return sendResponse(res, 401, [], 'Invalid Token');
+    }
     return sendResponse(res, 500, [], 'internal server error');
   }
   return 0;
