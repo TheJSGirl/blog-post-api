@@ -39,7 +39,8 @@ login.route('/')
       };
 
       // generate token
-      const token = jwt.sign(userDetailForToken,
+      const token = jwt.sign(
+        userDetailForToken,
         process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY },
       );
 
@@ -55,6 +56,14 @@ login.route('/')
       return sendResponse(res, 200, { token, refreshToken }, 'Login successful');
     } catch (err) {
       console.error(err);
+      if (err.name === 'TokenExpiredError') {
+        return sendResponse(res, 401, [], 'Token Expired');
+      }
+      
+      if (err.name === 'JsonWebTokenError') {
+        return sendResponse(res, 401, [], 'Invalid Token');
+      }
+      
       return sendResponse(res, 500, [], 'something went wrong');
     }
   });
