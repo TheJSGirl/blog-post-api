@@ -21,7 +21,7 @@ if (env === 'development') {
     connectionLimit: 5,
     host: 'localhost',
     user: 'root',
-    password: 'pinku',
+    password: 'ashok',
     database: 'blog_post',
   };
 } else if (env === 'test') {
