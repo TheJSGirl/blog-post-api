@@ -1,8 +1,8 @@
 const env = process.env.NODE_ENV || 'development';
 process.env.JWT_SECRET = 'thisisasimplesecreat';
 process.env.JWT_SECRET_REFRESH = 'abcdefghijklmnopilovecodingkeepcalmandcode';
-process.env.JWT_EXPIRY = '1d';
-process.env.JWT_EXPIRY_REFRESH = '7d'; // expiry after 7 days
+process.env.JWT_EXPIRY = '1h';
+process.env.JWT_EXPIRY_REFRESH = '2h'; // expiry after 7 days
 
 let poolConfig = null;
 if (env === 'production') {
