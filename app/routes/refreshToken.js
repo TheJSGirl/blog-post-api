@@ -3,7 +3,7 @@ const refreshTokenRoute = require('express').Router();
 const { sendResponse } = require('../helpers');
 
 
-refreshTokenRoute.post('/refresh', async (req, res) => {
+refreshTokenRoute.post('/', async (req, res) => {
   try {
     req.check('refreshToken', 'token should be present').exists().isInt().optional();
 
