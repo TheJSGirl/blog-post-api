@@ -59,11 +59,11 @@ login.route('/')
       if (err.name === 'TokenExpiredError') {
         return sendResponse(res, 401, [], 'Token Expired');
       }
-      
+
       if (err.name === 'JsonWebTokenError') {
         return sendResponse(res, 401, [], 'Invalid Token');
       }
-      
+
       return sendResponse(res, 500, [], 'something went wrong');
     }
   });
