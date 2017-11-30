@@ -5,19 +5,19 @@ const { sendResponse } = require('../helpers');
 
 refreshTokenRoute.post('/refresh', async (req, res) => {
   try {
-    req.check('token', 'token should be present').exists().isInt().optional();
+    req.check('refreshToken', 'token should be present').exists().isInt().optional();
 
     const errors = req.validationErrors();
     if (errors) {
       return sendResponse(res, 400, [], errors[0].msg);
     }
 
-    const { token } = req.body;
+    const oldRefreshToken = req.body.refreshToken;
     // get the token contents
-    const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    const decode = await jwt.verify(oldRefreshToken, process.env.JWT_SECRET);
 
     // generate token
-    const newToken = jwt.sign(
+    const token = jwt.sign(
       decode,
       process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY },
     );
@@ -29,7 +29,7 @@ refreshTokenRoute.post('/refresh', async (req, res) => {
 
     res.header('x-auth', token);
     res.header('x-auth-refresh', refreshToken);
-    sendResponse(res, 200, { newToken, refreshToken }, 'Generated new token');
+    sendResponse(res, 200, { token, refreshToken }, 'Generated new token');
   } catch (error) {
     return sendResponse(res, 500, [], 'internal server error');
   }
