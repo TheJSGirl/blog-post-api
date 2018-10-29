@@ -39,13 +39,21 @@ login.route('/')
       };
 
       // generate token
-      const token = jwt.sign(userDetailForToken,
+      const token = jwt.sign(
+        userDetailForToken,
         process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY },
       );
+
+      const refreshToken = jwt.sign(
+        userDetailForToken, process.env.JWT_SECRET_REFRESH,
+        { expiresIn: process.env.JWT_EXPIRY_REFRESH },
+      );
+
       // set token in response header
       res.header('x-auth', token);
+      res.header('x-auth-refresh', refreshToken);
       // also send token in response body
-      return sendResponse(res, 200, { token }, 'Login successful');
+      return sendResponse(res, 200, { token, refreshToken }, 'Login successful');
     } catch (err) {
       console.error(err);
       return sendResponse(res, 500, [], 'something went wrong');

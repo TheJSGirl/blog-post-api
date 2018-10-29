@@ -9,7 +9,6 @@ postRoute.route('/').get(async (req, res) => {
   req.check('keyword', 'keyword should be present').exists().isLength({ min: 3 }).optional();
 
   const errors = req.validationErrors();
-
   if (errors) {
     return sendResponse(res, 400, [], errors[0].msg);
   }
@@ -36,26 +35,24 @@ postRoute.route('/').get(async (req, res) => {
 
     const [data] = await pool.query(getQuery);
     // console.log(data);
-    if (data.length === 0) {
-      return sendResponse(res, 404, [], 'not found');
-    }
+    if (data.length !== 0) {
+      // comments query on post
+      const commentQuery = 'SELECT c.id as commentId, c.comments,c.commentedOn, c.createdAt, u.username as commentedBy FROM comments c INNER JOIN blogs ON c.commentedOn = blogs.id INNER JOIN users  u ON c.commentedBy = u.id';
 
-    // comments query on post
-    const commentQuery = 'SELECT c.id as commentId, c.comments,c.commentedOn, c.createdAt, u.username as commentedBy FROM comments c INNER JOIN blogs ON c.commentedOn = blogs.id INNER JOIN users  u ON c.commentedBy = u.id';
+      // execute query and get comments on a particular post
+      const [comments] = await pool.query(commentQuery);
 
-    // execute query and get comments on a particular post
-    const [comments] = await pool.query(commentQuery);
-
-    data.forEach((post) => {
-      const tempArr = [];
-      comments.forEach((comment) => {
-        if (comment.commentedOn === post.id) {
-          tempArr.push(comment);
-        }
+      data.forEach((post) => {
+        const tempArr = [];
+        comments.forEach((comment) => {
+          if (comment.commentedOn === post.id) {
+            tempArr.push(comment);
+          }
+        });
+        post.comments = tempArr;
+        post.commentCount = tempArr.length;
       });
-      post.comments = tempArr;
-      post.commentCount = tempArr.length;
-    });
+    }
 
     return sendResponse(res, 200, data, 'successful');
   } catch (err) {

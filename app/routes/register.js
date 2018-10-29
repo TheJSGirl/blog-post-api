@@ -35,11 +35,17 @@ signUp.route('/').post(async (req, res) => {
     }
 
     //generate token
-    const token = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY });
+    const token = jwt.sign(userData, process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRY });
+    const refreshToken = jwt.sign(
+      userData, process.env.JWT_SECRET_REFRESH,
+      { expiresIn: process.env.JWT_EXPIRY_REFRESH },
+    );
     //set token in response headers
     res.header('x-auth', token);
+    res.header('x-auth-refresh', token);
     
-    return sendResponse(res, 200, { token }, 'Registration successful');
+    return sendResponse(res, 200, { token, refreshToken }, 'Registration successful');
 
   
   } catch (err) {

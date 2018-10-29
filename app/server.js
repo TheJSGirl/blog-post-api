@@ -5,7 +5,7 @@ const cors = require('cors');
 const expressValidator = require('express-validator');
 const routes = require('./routes');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3030;
 
 // initiate app
 const app = express();
@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 app.use((req, res, next) => {
   // Expose the custom headers so that browser can allow to use it
-  res.setHeader('Access-Control-Expose-Headers','X-Powered-By, X-Auth');
+  res.setHeader('Access-Control-Expose-Headers', 'X-Powered-By, X-Auth');
   next();
 });
 

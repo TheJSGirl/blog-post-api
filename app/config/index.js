@@ -1,6 +1,8 @@
 const env = process.env.NODE_ENV || 'development';
 process.env.JWT_SECRET = 'thisisasimplesecreat';
-process.env.JWT_EXPIRY = '1d';
+process.env.JWT_SECRET_REFRESH = 'abcdefghijklmnopilovecodingkeepcalmandcode';
+process.env.JWT_EXPIRY = '1h';
+process.env.JWT_EXPIRY_REFRESH = '2h'; // expiry after 7 days
 
 let poolConfig = null;
 if (env === 'production') {
@@ -19,7 +21,7 @@ if (env === 'development') {
     connectionLimit: 5,
     host: 'localhost',
     user: 'root',
-    password: 'pinku',
+    password: 'ashok',
     database: 'blog_post',
   };
 } else if (env === 'test') {
